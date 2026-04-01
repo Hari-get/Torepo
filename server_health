@@ -1,0 +1,62 @@
+#!/bin/bash
+
+echo "please choose the option you want to check!"
+echo "a) Ram using status!"
+echo "b) Disk using status!"
+echo "c) Cpu using status!"
+read -p "please choose the option:" option
+
+#check the user input! 
+if [[ -z "$option" ]]
+then
+     echo "please enter something !"
+     exit
+elif [[ "$option" != "a" ]] && [[ "$option" != "b" ]] && [[ "$option" != "c" ]]
+then 
+     echo "! please enter the vaild option" 
+      exit
+fi
+
+#path for error log file!
+basepath="/home/vboxuser/Desktop/yum.package/error.log_collector/"
+
+#check the ram health
+Ram_checker=$(free -h | grep Mem | awk '{print $4}' | tr -d Mi)
+if [[ "$option" == "a" ]]
+then
+     if [[ "$Ram_checker" -le 100 ]]
+then 
+      echo "Ram space is reach there lower value $Ram_checker MB" 
+      echo "Ram space is reach there lower value $Ram_checker MB" >> "$basepath/Ram.log_checker" 
+
+else 
+      echo "Ram space is sufficient $Ram_checker"
+fi
+fi 
+
+#check the disk health!
+Disk_checker=$(df -h | grep /dev/sda2 | awk '{print $5}' | tr -d %)
+if [[ "$option" == "b" ]]
+then
+      if [[ "$Disk_checker" -ge 80 ]]
+then
+       echo "warning disk using is greater then $Disk_checker percentage"
+       echo "warning disk using is greater then $Disk_checker percentage" >> "$basepath/Disk.log_checker" 
+else
+      echo "Disk space using is normal $Disk_checker percentage"
+fi
+fi
+  
+#check the cpu health!
+Cpu_checker=$(top -bn1 | awk 'NR==3 {print 100 - $8}')
+cpu_checker=${Cpu_checker%.*} 
+if [[ "$option" == "c" ]]
+then
+     if [[ "$cpu_checker" -ge 80  ]]
+then 
+      echo "warning cpu usage is over load $Cpu_checker percentage"
+      echo "warning cpu usage is over load $Cpu_checker percentage" >> "$basepath/cpu.log_checker"
+else
+      echo "the cpu usage is normal $Cpu_checker percentage"
+fi
+fi
